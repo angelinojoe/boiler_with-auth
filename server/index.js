@@ -4,12 +4,48 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 const db = require('../db');
+const session = require('express-session');
+// configure and create our database store
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const dbStore = new SequelizeStore({ db: db });
+
+dbStore.sync();
 
 //middlewares
 app.use(morgan('dev'));
 express.static(path.join(__dirname, '../public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'a wildly insecure secret',
+  store: dbStore,
+  resave: false,
+  saveUninitialized: false
+}));
+
+//initialize passport
+const passport = require('passport');
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+//serialize/deserialize user
+passport.serializeUser((user, done) => {
+  try {
+    done(null, user.id);
+  } catch (err) {
+    done(err);
+  }
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id)
+    .then(user => done(null, user))
+    .catch(done);
+});
+
 app.use('/api', require('./apiRoutes'));
 
 // Send index.html for anything else.
