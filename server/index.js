@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
+const db = require('../db');
 
 //middlewares
 app.use(morgan('dev'));
@@ -26,4 +27,8 @@ app.use(function (err, req, res, next) {
 //start server
 app.listen(3000, function () {
   console.log("Your server, listening on port 3000");
+  db.sync({force: false})
+    .then(function () {
+      console.log('The postgres server is connected');
+    });
 });
