@@ -8,6 +8,4 @@ var db = require('./db');
 //set associations, example:
 //User.belongsToMany(Song, {through: 'UserFavSongs'});
 
-
-
 module.exports = db;

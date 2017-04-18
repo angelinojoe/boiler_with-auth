@@ -4,6 +4,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 const db = require('../db');
+const User = db.models.user;
 const session = require('express-session');
 // configure and create our database store
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
@@ -62,7 +63,7 @@ app.use(function (err, req, res, next) {
 
 //start server
 app.listen(3000, function () {
-  console.log("Your server, listening on port 3000");
+  console.log('Your server, listening on port 3000');
   db.sync({force: false})
     .then(function () {
       console.log('The postgres server is connected');
